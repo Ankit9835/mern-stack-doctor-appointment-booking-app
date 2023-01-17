@@ -1,10 +1,28 @@
-
-
+import  "./index.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import { Button, Space } from 'antd';
+import Register from "./pages/Register";
 function App() {
   return (
-    <div className="App">
-      <h2>App</h2>
-    </div>
+    <BrowserRouter>
+    
+    <Routes>
+      <Route
+        path="/login"
+        element={
+            <Login />
+        }
+      />
+      <Route
+        path="/register"
+        element={
+            <Register />
+        }
+      />
+     
+    </Routes>
+  </BrowserRouter>
   );
 }
 
