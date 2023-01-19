@@ -1,12 +1,32 @@
 import { Button, Form, Input } from "antd";
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useSelector,useDispatch } from "react-redux";
+import { hideLoading, showLoading } from "../redux/alertsSlice";
 
 function Register() {
-  
+  const navigate = useNavigate()
+  const {loading} = useSelector(state => state.alerts)
+  const dispatch = useDispatch()
   const onFinish = async (values) => {
-    
+      try{
+        dispatch(showLoading())
+        const response = await axios.post('/api/register', values)
+        console.log(response)
+        dispatch(hideLoading())
+        if(response.data.status){
+          toast.success(response.data.message)
+          navigate('/login')
+        } else {
+          dispatch(hideLoading())
+          toast.error(response.data.message)
+        }
+      } catch(err){
+        dispatch(hideLoading())
+         toast.error(err.message)
+      }
   };
 
   return (

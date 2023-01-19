@@ -1,13 +1,36 @@
 import { Button, Form, Input } from "antd";
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useSelector,useDispatch } from "react-redux";
+import { hideLoading, showLoading } from "../redux/alertsSlice";
 
 
 
 function Login() {
-  
+const navigate = useNavigate()
+const dispatch = useDispatch()
+const {loading} = useSelector(state => state.alerts)
+
 const onFinish = async (values) => {
-    console.log('test',values)
+    try{
+      dispatch(showLoading())
+      const response = await axios.post('/api/login', values)
+      console.log(response)
+      dispatch(hideLoading())
+      if(response.data.status){
+        toast.success(response.data.message)
+        localStorage.setItem('token',response.data.data)
+        navigate('/home')
+      } else {
+        dispatch(hideLoading())
+        toast.error(response.data.message)
+      }
+    } catch(err){
+      dispatch(hideLoading())
+      toast.error(err.message)
+    }
 }
  
 
