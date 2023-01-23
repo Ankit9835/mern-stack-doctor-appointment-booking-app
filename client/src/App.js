@@ -6,6 +6,8 @@ import { Button, Space } from 'antd';
 import Register from "./pages/Register";
 import Home from "./pages/Home";
 import { useSelector } from "react-redux";
+import ProtectedRoute from "./components/ProtectedRoute";
+import PublicRoute from "./components/PublicRoute";
 
 function App() {
   const { loading } = useSelector((state) => state.alerts);
@@ -21,20 +23,26 @@ function App() {
       <Route
         path="/login"
         element={
-            <Login />
+           <PublicRoute>
+             <Login /> 
+           </PublicRoute>
         }
       />
       <Route
         path="/register"
         element={
-            <Register />
+          <PublicRoute> 
+            <Register /> 
+          </PublicRoute>
         }
       />
 
        <Route
-        path="/home"
+        path="/"
         element={
+          <ProtectedRoute>
             <Home />
+          </ProtectedRoute>
         }
       />
     </Routes>

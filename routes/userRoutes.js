@@ -83,7 +83,7 @@ router.post("/get-user-info-by-id", authMiddleware, async (req, res) => {
       } else {
         res.status(200).send({
           success: true,
-          data: user,
+          data: user
         });
       }
     } catch (error) {

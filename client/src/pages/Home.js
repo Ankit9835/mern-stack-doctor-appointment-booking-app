@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import axios from 'axios'
 import { useSelector,useDispatch } from "react-redux";
+import  Layout  from '../components/Layout';
 
 const Home = () => {
     const {loading} = useSelector(state => state.alerts)
@@ -17,9 +18,9 @@ const Home = () => {
         getData()
     },[])
   return (
-    <div>
+    <Layout>
         Home
-    </div>
+    </Layout>
   )
 }
 
