@@ -7,6 +7,7 @@ import { Badge } from 'antd';
 
 const Layout = ({children}) => {
   const {user} = useSelector((state) => state.user)
+  console.log(user)
   const navigate = useNavigate();
   const location = useLocation();
   const [collapsed,setCollapsed] = useState(false)
@@ -78,7 +79,7 @@ const Layout = ({children}) => {
                 <div
                   className={`d-flex menu-item `}
                   onClick={() => {
-                    localStorage.clear();
+                    localStorage.removeItem('token');
                     navigate("/login");
                   }}
                 >
@@ -103,15 +104,18 @@ const Layout = ({children}) => {
                   ></i>
                 )}
     
-                <div className="d-flex align-items-center px-4">
-                 
-                    <i className="ri-notification-line header-action-icon px-3"></i>
-                 
-    
-                  <Link className="anchor mx-2" to="/profile">
-                    {user?.name}
-                  </Link>
-                </div>
+          <div className="d-flex align-items-center px-4">
+              <Badge
+                count={user?.unseenNotification.length}
+                onClick={() => navigate("/notifications")}
+              >
+                <i className="ri-notification-line header-action-icon px-3"></i>
+              </Badge>
+
+              <Link className="anchor mx-2" to="/profile">
+                {user?.name}
+              </Link>
+            </div>
               </div>
     
               <div className="body">{children}</div>

@@ -22,7 +22,7 @@ const onFinish = async (values) => {
       if(response.data.status){
         toast.success(response.data.message)
         localStorage.setItem('token',response.data.data)
-        navigate('/home')
+        navigate('/')
       } else {
         dispatch(hideLoading())
         toast.error(response.data.message)

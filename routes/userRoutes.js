@@ -2,6 +2,7 @@ const express = require('express')
 const bcrypt = require('bcryptjs')
 const router = express.Router()
 const User = require('../models/userModel')
+const Doctor = require('../models/doctorModel')
 const jwt = require('jsonwebtoken')
 const authMiddleware = require('../middlewares/authMiddleware')
 
@@ -93,4 +94,81 @@ router.post("/get-user-info-by-id", authMiddleware, async (req, res) => {
     }
   });
 
+  router.post('/apply-doctor-account', async (req,res) => {
+    try{
+      const newDoctor = new Doctor(req.body)
+      await newDoctor.save()
+      const adminUser = await User.findOne({isAdmin:true})
+      const unseenNotification = adminUser.unseenNotification
+      unseenNotification.push({
+        type:'New Doctor Request',
+        message:`${newDoctor.firstName} ${newDoctor.lastName} has applied for a doctor`,
+        data:{
+            doctorId: newDoctor._id,
+            name: newDoctor.firstName + " " + newDoctor.lastName
+        },
+        onClickPath:'/admin/doctor'
+      })
+      await User.findByIdAndUpdate(adminUser._id, { unseenNotification })
+      res.status(200).send({
+        success: true,
+        message: "Doctor account applied successfully",
+      });
+    } catch(err){
+        return res.send({
+            message:err,
+            data:err,
+            status:false
+        })
+    }
+})
+
+
+router.post('/mark-all-read', authMiddleware, async(req,res) => {
+    try{
+        const user = await User.findOne({_id:req.body.userId})
+        const unseenNotification = user.unseenNotification
+        const seenNotification = user.seenNotification
+        seenNotification.push(...unseenNotification)
+        user.unseenNotification = []
+        user.seenNotification = seenNotification
+        const updateUser = await user.save()
+        updateUser.password = undefined
+        console.log(user)
+        return res.status(200).json({
+            success:true,
+            message:'All Notifications marked as read',
+            data:updateUser
+        })
+    } catch(err){
+        return res.status(400).json({
+            status:false,
+            message:err
+        })
+    }
+})
+
+router.post('/remove-all-notifications', authMiddleware, async (req,res) => {
+    try{
+        const user = await User.findOne({_id:req.body.userId})
+        const unseenNotification = user.unseenNotification
+        const seenNotification = user.seenNotification
+        user.unseenNotification = []
+        user.seenNotification = []
+        const updateUser = await user.save()
+        updateUser.password = undefined
+        console.log(updateUser)
+        return res.status(200).json({
+            success:true,
+            message:'All notofications removed successfully',
+            data:updateUser
+        })
+    } catch(error){
+        console.log(error)
+        return res.status(400).json({
+            success:false,
+            message:error
+        })
+    }
+})
 module.exports = router
