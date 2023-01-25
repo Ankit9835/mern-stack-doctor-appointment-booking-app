@@ -107,7 +107,7 @@ router.post("/get-user-info-by-id", authMiddleware, async (req, res) => {
             doctorId: newDoctor._id,
             name: newDoctor.firstName + " " + newDoctor.lastName
         },
-        onClickPath:'/admin/doctor'
+        onClickPath:'/admin/doctorlist'
       })
       await User.findByIdAndUpdate(adminUser._id, { unseenNotification })
       res.status(200).send({
@@ -160,7 +160,7 @@ router.post('/remove-all-notifications', authMiddleware, async (req,res) => {
         console.log(updateUser)
         return res.status(200).json({
             success:true,
-            message:'All notofications removed successfully',
+            message:'All notifications removed successfully',
             data:updateUser
         })
     } catch(error){
