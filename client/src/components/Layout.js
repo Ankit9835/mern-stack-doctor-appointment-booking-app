@@ -7,7 +7,7 @@ import { Badge } from 'antd';
 
 const Layout = ({children}) => {
   const {user} = useSelector((state) => state.user)
-  console.log(user)
+  //console.log(user)
   const navigate = useNavigate();
   const location = useLocation();
   const [collapsed,setCollapsed] = useState(false)
@@ -26,7 +26,31 @@ const Layout = ({children}) => {
       name: "Apply Doctor",
       path: "/apply-doctor",
       icon: "ri-hospital-line",
-    }
+    },
+    {
+      name: "Profile",
+      path: "/profile",
+      icon: "ri-user-line",
+    },
+  ];
+
+  const doctorMenu = [
+    {
+      name: "Home",
+      path: "/",
+      icon: "ri-home-line",
+    },
+    {
+      name: "Appointments",
+      path: "/appointments",
+      icon: "ri-file-list-line",
+    },
+    {
+      name: "Profile",
+      path: "/doctor/profile",
+      icon: "ri-user-line",
+    },
+   
   ];
 
   const adminMenu = [
@@ -51,8 +75,8 @@ const Layout = ({children}) => {
       icon: "ri-user-line",
     },
   ];
-  console.log(user)
-  const menuToBeRendered = user?.isAdmin ? adminMenu : userMenu
+ // console.log(user)
+  const menuToBeRendered = user?.isAdmin ? adminMenu : user?.isDoctor ? doctorMenu : userMenu
     return (
         <div className="main">
           <div className="d-flex layout">

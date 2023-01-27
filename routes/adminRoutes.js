@@ -51,6 +51,7 @@ router.post('/change-doctor-status', authMiddleware, async (req,res) => {
             message:`Admin has ${status} your request`,
             onClickPath:'/navigations'
         })
+        user.isDoctor = true
         await user.save()
         return res.status(200).json({
             success:true,

@@ -24,7 +24,7 @@ const ProtectedRoute = (props) => {
       }
     )
     dispatch(hideLoading())
-    console.log(response)
+   // console.log(response)
     if(response.data.success){
       dispatch(setUser(response.data.data));
     } else {

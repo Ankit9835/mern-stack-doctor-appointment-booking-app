@@ -171,4 +171,23 @@ router.post('/remove-all-notifications', authMiddleware, async (req,res) => {
         })
     }
 })
+
+router.get('/get-approved-doctors', authMiddleware, async (req,res) => {
+    try{
+        const doctors = await Doctor.find({status:'approved'})
+        if(doctors){
+            return res.status(200).json({
+                success:true,
+                message:'Doctor fetched',
+                data:doctors
+            })
+        }
+    } catch(error){
+        return res.status(400).json({
+            success:false,
+            message:error,
+          
+        })
+    }
+})
 module.exports = router
