@@ -3,8 +3,10 @@ const bcrypt = require('bcryptjs')
 const router = express.Router()
 const User = require('../models/userModel')
 const Doctor = require('../models/doctorModel')
+const Appointment = require('../models/appointmentModel')
 const jwt = require('jsonwebtoken')
 const authMiddleware = require('../middlewares/authMiddleware')
+const moment = require('moment')
 
 router.post('/register', async (req,res) => {
     try{
@@ -96,6 +98,7 @@ router.post("/get-user-info-by-id", authMiddleware, async (req, res) => {
 
   router.post('/apply-doctor-account', async (req,res) => {
     try{
+    
       const newDoctor = new Doctor(req.body)
       await newDoctor.save()
       const adminUser = await User.findOne({isAdmin:true})
@@ -190,4 +193,100 @@ router.get('/get-approved-doctors', authMiddleware, async (req,res) => {
         })
     }
 })
+
+router.post('/book-appointment', authMiddleware, async (req,res) => {
+    try{
+        req.body.status = 'pending'
+        req.body.date = moment(req.body.date, "DD-MM-YYYY").toISOString()
+        console.log(req.body.date)
+        req.body.time = moment(req.body.time, "HH:mm").format('HH:mm');
+        const appointment = new Appointment(req.body)
+        await appointment.save()
+        const doctor = await User.findOne({_id:req.body.doctorInfo.userId})
+        doctor.unseenNotification.push({
+            type:'A new appointment is available',
+            message:`A new patient - ${req.body.userInfo.name} is booked `
+        })
+        await doctor.save()
+        return res.status(200).json({
+            success:true,
+            message:'Appointment booked successfully'
+        })
+    } catch(error){
+        return res.status(400).json({
+            success:false,
+            message:error
+        })
+    }
+})
+
+router.post('/check-booking', async (req,res) => {
+    try{
+        const date = moment(req.body.date, "DD-MM-YYYY").toISOString()
+        const fromTime = moment(req.body.time, "HH::mm").subtract(1, "hours").format('HH:mm')
+        const toTime = moment(req.body.time, "HH::mm").add(1, "hours").format('HH:mm')
+        const from = moment(req.body.time, "HH::mm").format('HH:mm')
+        const to = moment(req.body.time, "HH::mm").format('HH:mm')
+        console.log('from',from)
+        console.log('to',to)
+       // console.log(toTime)
+        const doctorId = req.body.doctorId
+        const appointments = await Appointment.find({
+            doctorId,
+            date,
+            time: { $gte: fromTime, $lte: toTime },
+          });
+          console.log(appointments.length)
+          const doctor = await Doctor.findOne({_id:doctorId})
+         
+        const check = await Doctor.find({
+             _id:doctorId,
+             timings: {$gte: from, $lte: to}
+        })
+
+        console.log('test',check)
+
+        if(check.length == 0){
+            return res.status(200).send({
+                message: "Appointments not available",
+                success: false,
+              });
+        }
+         else if (appointments.length > 0) {
+            return res.status(200).send({
+              message: "Appointments not available",
+              success: false,
+            });
+          } else {
+            return res.status(200).send({
+              message: "Appointments available",
+              success: true,
+            });
+          }
+    } catch(error){
+        console.log(error)
+        return res.status(400).json({
+            success:false,
+            message:'Error'
+        })
+    }
+})
+
+router.get("/get-appointments-by-user-id", authMiddleware, async (req, res) => {
+    try {
+      const appointments = await Appointment.find({ userId: req.body.userId });
+      res.status(200).send({
+        message: "Appointments fetched successfully",
+        success: true,
+        data: appointments,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({
+        message: "Error fetching appointments",
+        success: false,
+        error,
+      });
+    }
+  });
 module.exports = router

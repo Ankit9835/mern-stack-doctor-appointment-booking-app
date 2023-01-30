@@ -13,6 +13,7 @@ const ApplyDoctor = () => {
     const navigate = useNavigate()
     const onFinish = async (values) => {
         try{
+            console.log(values)
             dispatch(showLoading())
             const response = await axios.post('/api/apply-doctor-account',{
                 ...values,
@@ -135,7 +136,7 @@ const ApplyDoctor = () => {
                 name="timings"
                 rules={[{ required: true }]}
             >
-                <TimePicker.RangePicker format="HH:mm" />
+                <TimePicker.RangePicker format="HH:mm A" />
             </Form.Item>
             </Col>
         </Row>
